@@ -1,320 +1,384 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MBU Enhanced Transport Management System</title>
-    <link rel="stylesheet" href="style.css">
-
-    <!-- Leaflet CSS and JS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-
-    <!-- Chart.js -->
+    <title>AI Transport Hub - University Transportation System</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-
 <body>
-    <div class="app">
-        <!-- Header -->
-        <header class="header">
-            <div class="container">
-                <div class="header__content">
-                    <h1 class="header__title">🚌 MBU Transport Hub</h1>
-                    <div class="header__status">
-                        <span class="status status--info" id="current-demand">Medium Demand</span>
-                        <span class="status status--success" id="surge-rate">1.2x Surge</span>
-                        <span class="status status--success" id="vehicles-online">15 Online</span>
-                    </div>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="screen active">
+        <div class="login-container">
+            <div class="login-header">
+                <h1>AI Transport Hub</h1>
+                <p>Smart Transportation for University Students</p>
+            </div>
+            
+            <div class="role-selection">
+                <h2>Select Your Role</h2>
+                <div class="role-buttons">
+                    <button class="btn btn--primary role-btn" data-role="student">
+                        <div class="role-icon">🎓</div>
+                        <span>Student</span>
+                    </button>
+                    <button class="btn btn--primary role-btn" data-role="driver">
+                        <div class="role-icon">🚗</div>
+                        <span>Driver</span>
+                    </button>
+                    <button class="btn btn--primary role-btn" data-role="admin">
+                        <div class="role-icon">⚙️</div>
+                        <span>Admin</span>
+                    </button>
                 </div>
             </div>
-        </header>
 
-        <!-- Navigation -->
-        <nav class="nav">
-            <div class="container">
-                <div class="nav__tabs">
-                    <button class="nav__tab nav__tab--active" data-tab="dashboard">📊 Dashboard</button>
-                    <button class="nav__tab" data-tab="incentives">💰 Incentives</button>
-                    <button class="nav__tab" data-tab="surge">📈 Surge Prediction</button>
-                    <button class="nav__tab" data-tab="polls">🗳️ Travel Polls</button>
-                    <button class="nav__tab" data-tab="availability">🗺️ Live Map</button>
-                </div>
-            </div>
-        </nav>
-
-        <!-- Main Content -->
-        <main class="main">
-            <div class="container">
-                <!-- Dashboard Section -->
-                <section id="dashboard" class="section section--active">
-                    <div class="dashboard">
-                        <div class="dashboard__stats">
-                            <div class="stat-card stat-card--primary">
-                                <div class="stat-card__icon">👥</div>
-                                <div class="stat-card__content">
-                                    <h3 class="stat-card__title">Active Drivers</h3>
-                                    <div class="stat-card__value" id="active-drivers">15</div>
-                                    <div class="stat-card__change">+2 from yesterday</div>
-                                </div>
-                            </div>
-                            <div class="stat-card stat-card--success">
-                                <div class="stat-card__icon">🚗</div>
-                                <div class="stat-card__content">
-                                    <h3 class="stat-card__title">Today's Trips</h3>
-                                    <div class="stat-card__value" id="total-trips">147</div>
-                                    <div class="stat-card__change">+23% growth</div>
-                                </div>
-                            </div>
-                            <div class="stat-card stat-card--warning">
-                                <div class="stat-card__icon">⚡</div>
-                                <div class="stat-card__content">
-                                    <h3 class="stat-card__title">Current Surge</h3>
-                                    <div class="stat-card__value" id="current-surge">1.2x</div>
-                                    <div class="stat-card__change">Normal range</div>
-                                </div>
-                            </div>
-                            <div class="stat-card stat-card--info">
-                                <div class="stat-card__icon">💰</div>
-                                <div class="stat-card__content">
-                                    <h3 class="stat-card__title">Revenue Today</h3>
-                                    <div class="stat-card__value">₹8,750</div>
-                                    <div class="stat-card__change">+15% from avg</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Live Map Preview -->
-                        <div class="dashboard__map-preview">
-                            <div class="card">
-                                <div class="card__body">
-                                    <div class="map-preview-header">
-                                        <h3>🗺️ Live Vehicle Tracking</h3>
-                                        <button class="btn btn--primary btn--sm" onclick="switchTab('availability')">View Full Map</button>
-                                    </div>
-                                    <div class="map-preview" id="dashboard-map" style="height: 200px; border-radius: var(--radius-base); overflow: hidden;"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="dashboard__charts">
-                            <div class="chart-container">
-                                <div class="card">
-                                    <div class="card__body">
-                                        <h3>Driver Performance Overview</h3>
-                                        <div class="overview-chart" style="position: relative; height: 300px;">
-                                            <canvas id="overviewChart"></canvas>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="dashboard__quick-actions">
-                            <h3>🚀 Quick Actions</h3>
-                            <div class="quick-actions">
-                                <button class="btn btn--primary" onclick="switchTab('incentives')">💰 View Incentives</button>
-                                <button class="btn btn--primary" onclick="switchTab('surge')">📈 Check Surge</button>
-                                <button class="btn btn--primary" onclick="switchTab('polls')">🗳️ Create Poll</button>
-                                <button class="btn btn--primary" onclick="switchTab('availability')">🗺️ Live Tracking</button>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Driver Incentives Section -->
-                <section id="incentives" class="section">
-                    <div class="incentives">
-                        <div class="section-header">
-                            <h2>💰 Smart Driver Incentive System</h2>
-                            <p>AI-powered bonus recommendations based on real-time demand analysis</p>
-                        </div>
-
-                        <div class="incentives__header">
-                            <div class="demand-indicator">
-                                <h3>📊 Current Demand Level: <span id="demand-level">Medium</span></h3>
-                                <div class="demand-bar">
-                                    <div class="demand-fill" id="demand-fill"></div>
-                                </div>
-                                <div class="demand-stats">
-                                    <span>Low</span>
-                                    <span>Medium</span>
-                                    <span>High</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="incentives__suggestions">
-                            <h3>🤖 AI-Generated Incentive Suggestions</h3>
-                            <div class="incentive-cards" id="incentive-cards"></div>
-                        </div>
-
-                        <div class="incentives__drivers">
-                            <h3>📈 Driver Performance Analytics</h3>
-                            <div class="driver-performance-chart" style="position: relative; height: 400px;">
-                                <canvas id="driverChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Surge Prediction Section -->
-                <section id="surge" class="section">
-                    <div class="surge">
-                        <div class="section-header">
-                            <h2>📈 Event-Based Surge Prediction</h2>
-                            <p>Predict demand spikes using AI analysis of local events and historical data</p>
-                        </div>
-
-                        <div class="surge__calendar">
-                            <h3>📅 Upcoming High-Demand Events</h3>
-                            <div class="events-grid" id="events-grid"></div>
-                        </div>
-
-                        <div class="surge__chart">
-                            <h3>📊 Demand Forecast Chart</h3>
-                            <div class="surge-chart" style="position: relative; height: 400px;">
-                                <canvas id="surgeChart"></canvas>
-                            </div>
-                        </div>
-
-                        <div class="surge__alerts">
-                            <h3>🚨 Smart Alerts</h3>
-                            <div class="alert-cards">
-                                <div class="alert-card alert-card--high">
-                                    <div class="alert-icon">⚠️</div>
-                                    <div class="alert-content">
-                                        <h4>High Demand Alert</h4>
-                                        <p>Expected 2.5x surge during Tirupati Brahmotsavam (Sep 15)</p>
-                                        <small>Recommended: Activate premium incentives</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Travel Coordination Section -->
-                <section id="polls" class="section">
-                    <div class="polls">
-                        <div class="section-header">
-                            <h2>🗳️ Smart Travel Coordination</h2>
-                            <p>Coordinate group travels with intelligent polling and route optimization</p>
-                        </div>
-
-                        <div class="polls__actions">
-                            <button class="btn btn--primary" id="create-poll-btn">➕ Create New Travel Poll</button>
-                            <button class="btn btn--secondary">📊 Poll Analytics</button>
-                        </div>
-
-                        <div class="polls__active">
-                            <h3>🔥 Active Travel Polls</h3>
-                            <div class="polls-grid" id="polls-grid"></div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Enhanced Transport Availability Section -->
-                <section id="availability" class="section">
-                    <div class="availability">
-                        <div class="section-header">
-                            <h2>🗺️ Live Transport Tracking & Availability</h2>
-                            <p>Real-time vehicle locations with interactive mapping powered by OpenStreetMap</p>
-                        </div>
-
-                        <!-- Map Controls -->
-                        <div class="map-controls">
-                            <div class="map-controls__left">
-                                <button class="btn btn--secondary btn--sm" id="locate-me">📍 My Location</button>
-                                <button class="btn btn--secondary btn--sm" id="refresh-vehicles">🔄 Refresh</button>
-                                <select class="form-control" id="vehicle-filter" style="width: auto; display: inline-block;">
-                                    <option value="all">All Vehicles</option>
-                                    <option value="available">Available Only</option>
-                                    <option value="auto">Auto Rickshaws</option>
-                                    <option value="bus">Buses</option>
-                                    <option value="car">Cars</option>
-                                </select>
-                            </div>
-                            <div class="map-controls__right">
-                                <div class="live-indicator">
-                                    <div class="live-dot"></div>
-                                    <span>Live Tracking Active</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Interactive Map -->
-                        <div class="availability__map">
-                            <div class="map-container-enhanced">
-                                <div id="main-transport-map" style="height: 500px; width: 100%; border-radius: var(--radius-lg); overflow: hidden;"></div>
-                                <div class="map-overlay">
-                                    <div class="map-legend">
-                                        <h4>🗂️ Legend</h4>
-                                        <div class="legend-item"><span class="legend-color" style="background: #e74c3c;"></span> MBU Campus</div>
-                                        <div class="legend-item"><span class="legend-color" style="background: #2ecc71;"></span> Available Vehicles</div>
-                                        <div class="legend-item"><span class="legend-color" style="background: #f39c12;"></span> Busy Vehicles</div>
-                                        <div class="legend-item"><span class="legend-color" style="background: #3498db;"></span> Destinations</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Vehicle Status Panel -->
-                        <div class="vehicle-status-panel">
-                            <h3>🚗 Live Vehicle Status</h3>
-                            <div class="vehicle-cards" id="vehicle-cards"></div>
-                        </div>
-
-                        <!-- Destinations Grid -->
-                        <div class="availability__destinations">
-                            <h3>📍 Popular Destinations</h3>
-                            <div class="destinations-grid" id="destinations-grid"></div>
-                        </div>
-                    </div>
-                </section>
-            </div>
-        </main>
-    </div>
-
-    <!-- Enhanced Modal for Create Poll -->
-    <div class="modal hidden" id="create-poll-modal">
-        <div class="modal__backdrop"></div>
-        <div class="modal__content">
-            <div class="modal__header">
-                <h3>🗳️ Create New Travel Poll</h3>
-                <button class="modal__close" id="close-modal">&times;</button>
-            </div>
-            <div class="modal__body">
-                <form id="create-poll-form">
+            <div class="login-form-container hidden">
+                <form id="loginForm" class="login-form">
                     <div class="form-group">
-                        <label class="form-label">📝 Poll Title</label>
-                        <input type="text" class="form-control" id="poll-title" placeholder="e.g., Weekend Trip to Tirupati Temple">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" id="username" class="form-control" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">📍 Destination</label>
-                        <select class="form-control" id="poll-destination">
-                            <option value="">Select destination</option>
-                            <option value="Tirupati Temple">🛕 Tirupati Temple</option>
-                            <option value="Saptagiri Mall">🛍️ Saptagiri Mall</option>
-                            <option value="PVR Cinemas">🎬 PVR Cinemas</option>
-                            <option value="Railway Station">🚂 Railway Station</option>
-                            <option value="Bus Station">🚌 Bus Station</option>
-                        </select>
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" id="password" class="form-control" required>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">⏰ Time Options (one per line)</label>
-                        <textarea class="form-control" id="poll-options" rows="4" placeholder="Saturday 6:00 AM&#10;Saturday 7:00 AM&#10;Sunday 6:00 AM&#10;Sunday 7:00 AM"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <button type="submit" class="btn btn--primary btn--full-width">🚀 Create Poll</button>
-                    </div>
+                    <button type="submit" class="btn btn--primary btn--full-width">Login</button>
                 </form>
             </div>
         </div>
     </div>
 
-    <script src="app.js"></script>
-</body>
+    <!-- Student Dashboard -->
+    <div id="studentDashboard" class="screen">
+        <header class="dashboard-header">
+            <div class="header-content">
+                <h1>Student Dashboard</h1>
+                <div class="header-actions">
+                    <button class="btn btn--outline emergency-btn" onclick="showEmergency()">🚨 Emergency</button>
+                    <button class="btn btn--secondary" onclick="logout()">Logout</button>
+                </div>
+            </div>
+        </header>
 
+        <div class="dashboard-container">
+            <div class="dashboard-grid">
+                <!-- Quick Actions -->
+                <div class="card quick-actions">
+                    <div class="card__body">
+                        <h3>Quick Actions</h3>
+                        <div class="action-buttons">
+                            <button class="btn btn--primary" onclick="showTransportAvailability()">Check Transport</button>
+                            <button class="btn btn--primary" onclick="showDistanceCalculator()">Distance Calculator</button>
+                            <button class="btn btn--primary" onclick="showHolidayPolls()">Holiday Travel</button>
+                            <button class="btn btn--primary" onclick="showLiveMap()">Live Map</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Recommendations -->
+                <div class="card ai-recommendations">
+                    <div class="card__body">
+                        <h3>AI Recommendations</h3>
+                        <div class="recommendation-item">
+                            <span class="status status--success">Best Time</span>
+                            <p>Travel at 2:30 PM for 20% less wait time</p>
+                        </div>
+                        <div class="recommendation-item">
+                            <span class="status status--warning">Surge Alert</span>
+                            <p>High demand expected during College Fest (Sep 15)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Transport Status -->
+                <div class="card transport-status">
+                    <div class="card__body">
+                        <h3>Live Transport Status</h3>
+                        <div class="transport-location">
+                            <h4>MBU Main Gate</h4>
+                            <div class="transport-counts">
+                                <span class="transport-item">🚐 Autos: <strong id="autoCount">8</strong></span>
+                                <span class="transport-item">🚌 Buses: <strong id="busCount">3</strong></span>
+                            </div>
+                            <p class="wait-time">Wait time: <span id="waitTime">5 minutes</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Driver Dashboard -->
+    <div id="driverDashboard" class="screen">
+        <header class="dashboard-header">
+            <div class="header-content">
+                <h1>Driver Dashboard</h1>
+                <div class="header-actions">
+                    <button class="btn btn--outline emergency-btn" onclick="showEmergency()">🚨 Emergency</button>
+                    <button class="btn btn--secondary" onclick="logout()">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="dashboard-container">
+            <div class="dashboard-grid">
+                <!-- Driver Stats -->
+                <div class="card driver-stats">
+                    <div class="card__body">
+                        <h3>Performance Stats</h3>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <span class="stat-value" id="driverRating">4.2</span>
+                                <span class="stat-label">Rating</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="recentTrips">15</span>
+                                <span class="stat-label">Recent Trips</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="performanceScore">85</span>
+                                <span class="stat-label">Score</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Incentives -->
+                <div class="card ai-incentives">
+                    <div class="card__body">
+                        <h3>AI Incentive Recommendations</h3>
+                        <div class="incentive-item">
+                            <div class="incentive-header">
+                                <span class="status status--success">Active Bonus</span>
+                                <span class="bonus-amount">+₹50</span>
+                            </div>
+                            <p>Complete 5 rides during 2-4 PM low-demand period</p>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 60%"></div>
+                            </div>
+                            <span class="progress-text">3/5 completed</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Map for Drivers -->
+                <div class="card driver-map">
+                    <div class="card__body">
+                        <h3>Your Location</h3>
+                        <div id="driverMap" style="height: 200px; position: relative;"></div>
+                        <div class="map-controls">
+                            <button class="btn btn--sm btn--primary">Update Location</button>
+                            <span class="status--success">Available</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="adminDashboard" class="screen">
+        <header class="dashboard-header">
+            <div class="header-content">
+                <h1>Admin Dashboard</h1>
+                <div class="header-actions">
+                    <button class="btn btn--outline emergency-btn" onclick="showEmergency()">🚨 Emergency</button>
+                    <button class="btn btn--secondary" onclick="logout()">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="dashboard-container">
+            <div class="dashboard-grid">
+                <!-- System Overview -->
+                <div class="card system-overview">
+                    <div class="card__body">
+                        <h3>System Overview</h3>
+                        <div class="overview-stats">
+                            <div class="overview-item">
+                                <span class="overview-number">1,247</span>
+                                <span class="overview-label">Active Students</span>
+                            </div>
+                            <div class="overview-item">
+                                <span class="overview-number">85</span>
+                                <span class="overview-label">Active Drivers</span>
+                            </div>
+                            <div class="overview-item">
+                                <span class="overview-number">156</span>
+                                <span class="overview-label">Rides Today</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Chart -->
+                <div class="card performance-chart">
+                    <div class="card__body">
+                        <h3>Daily Performance</h3>
+                        <div style="height: 200px; position: relative;">
+                            <canvas id="performanceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event Predictions -->
+                <div class="card event-predictions">
+                    <div class="card__body">
+                        <h3>AI Event Predictions</h3>
+                        <div class="event-item">
+                            <div class="event-header">
+                                <strong>College Fest</strong>
+                                <span class="status status--error">High Impact</span>
+                            </div>
+                            <p>Sep 15, 2:00 PM • Expected: 1,500 participants</p>
+                            <p>Surge Multiplier: <strong>2.1x</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Distance Calculator Modal -->
+    <div id="distanceModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Distance Calculator</h3>
+                <button class="modal-close" onclick="closeModal('distanceModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="fromLocation" class="form-label">From</label>
+                    <select id="fromLocation" class="form-control">
+                        <option value="">Select starting point</option>
+                        <option value="MBU Main Gate">MBU Main Gate</option>
+                        <option value="Boys Hostel">Boys Hostel</option>
+                        <option value="Tirupati Railway Station">Tirupati Railway Station</option>
+                        <option value="City Center Mall">City Center Mall</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="toLocation" class="form-label">To</label>
+                    <select id="toLocation" class="form-control">
+                        <option value="">Select destination</option>
+                        <option value="MBU Main Gate">MBU Main Gate</option>
+                        <option value="Boys Hostel">Boys Hostel</option>
+                        <option value="Tirupati Railway Station">Tirupati Railway Station</option>
+                        <option value="City Center Mall">City Center Mall</option>
+                        <option value="Tirupati Bus Stand">Tirupati Bus Stand</option>
+                    </select>
+                </div>
+                <button class="btn btn--primary btn--full-width" onclick="calculateDistance()">Calculate Distance</button>
+                <div id="distanceResult" class="distance-result hidden">
+                    <h4>Route Information</h4>
+                    <p><strong>Distance:</strong> <span id="routeDistance">-</span> km</p>
+                    <p><strong>Estimated Time:</strong> <span id="routeTime">-</span> minutes</p>
+                    <p><strong>Estimated Fare:</strong> ₹<span id="routeFare">-</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transport Availability Modal -->
+    <div id="transportModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Live Transport Availability</h3>
+                <button class="modal-close" onclick="closeModal('transportModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="transportLocations"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Holiday Polls Modal -->
+    <div id="holidayModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Holiday Travel Coordination</h3>
+                <button class="modal-close" onclick="closeModal('holidayModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="poll-item">
+                    <h4>Chennai Trip</h4>
+                    <div class="poll-details">
+                        <p><strong>Date:</strong> Oct 2-5, 2025</p>
+                        <p><strong>Departure:</strong> 8:00 AM from MBU Main Gate</p>
+                        <p><strong>Participants:</strong> <span class="participant-count">25</span>/30</p>
+                        <p><strong>Cost per person:</strong> ₹1,500</p>
+                    </div>
+                    <div class="poll-actions">
+                        <button class="btn btn--primary" onclick="joinTrip()">Join Trip</button>
+                        <button class="btn btn--outline" onclick="voteTime()">Vote for Time</button>
+                    </div>
+                    <div class="poll-status">
+                        <span class="status status--success">Open for Registration</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Map Modal -->
+    <div id="mapModal" class="modal hidden">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3>Live Vehicle Tracking</h3>
+                <button class="modal-close" onclick="closeModal('mapModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="liveMap" style="height: 400px; position: relative;"></div>
+                <div class="map-legend">
+                    <div class="legend-item">
+                        <span class="legend-marker bus"></span>
+                        <span>Buses</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-marker auto"></span>
+                        <span>Autos</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-marker location"></span>
+                        <span>Key Locations</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Emergency Modal -->
+    <div id="emergencyModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header emergency-header">
+                <h3>🚨 Emergency Services</h3>
+                <button class="modal-close" onclick="closeModal('emergencyModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="emergency-warning">
+                    <p><strong>In case of emergency, call immediately!</strong></p>
+                </div>
+                <div id="emergencyServices"></div>
+                <div class="sos-section">
+                    <button class="btn btn--lg btn--full-width emergency-sos" onclick="triggerSOS()">
+                        🆘 EMERGENCY SOS
+                    </button>
+                    <p class="sos-description">This will alert authorities and share your location</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="loading-spinner"></div>
+        <p>Loading...</p>
+    </div>
+
+    <script src="index.js"></script>
+</body>
 </html>
